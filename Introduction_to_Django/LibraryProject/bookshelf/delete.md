@@ -4,5 +4,6 @@ book.delete()
 (1, {'bookshelf.Book': 1})
 
 Confirming the Delete
+from bookshelf.models import Book
 Book.objects.all()           
 <QuerySet []>
