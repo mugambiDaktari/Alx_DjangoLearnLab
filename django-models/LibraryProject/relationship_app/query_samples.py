@@ -4,9 +4,11 @@ from relationship_app.models import Book, Author, Library, Librarian
 books_by_author = Book.objects.filter(author__name="Author's Name")
 
 # List all books in a library.
-library = Library.objects.get(name="Library_name")
+library_name = "Library_name"
+library = Library.objects.get(name=library_name)
 books_in_library = library.books.all()
 
+
 # Retrieve the librarian for a library.
-library = Library.objects.get(name="Library Name")
+library = Library.objects.get(name=library_name)
 librarian = library.librarian
