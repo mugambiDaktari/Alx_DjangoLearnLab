@@ -8,7 +8,7 @@ from django.views.generic import CreateView
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, permission_required, login_required
 from django.core.exceptions import PermissionDenied
 
 # Create your views here
@@ -61,6 +61,15 @@ def member_view(request):
     # View logic for Admin
     return render(request, 'relationship_app/member_view.html')
 
-
+@login_required
+@permission_required('your_app.can_add_book', raise_exception=True)
+def add_book_view(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        author = request.POST.get('author')
+        if title and author:  # Basic validation
+            Book.objects.create(title=title, author=author)
+            return redirect('book_list')  # Redirect after adding
+    return render(request, 'books/add_book.html')
 
 
