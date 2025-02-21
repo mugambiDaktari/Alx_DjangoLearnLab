@@ -72,4 +72,25 @@ def add_book_view(request):
             return redirect('book_list')  # Redirect after adding
     return render(request, 'books/add_book.html')
 
+@login_required
+@permission_required('your_app.can_change_book', raise_exception=True)
+def edit_book_view(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        author = request.POST.get('author')
+        if title and author:
+            book.title = title
+            book.author = author
+            book.save()
+            return redirect('book_list')  # Redirect after editing
+    return render(request, 'books/edit_book.html', {'book': book})
 
+@login_required
+@permission_required('your_app.can_delete_book', raise_exception=True)
+def delete_book_view(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    if request.method == 'POST':
+        book.delete()
+        return redirect('book_list')  # Redirect after deleting
+    return render(request, 'books/delete_book.html', {'book': book})
