@@ -8,6 +8,8 @@ from django.views.generic import CreateView
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 
+from .utils import admin_required, librarian_required, member_required
+
 # Create your views here
 def list_books(request):
     books = Book.objects.all()
@@ -27,3 +29,20 @@ def register(request):
     else:
         form = UserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
+
+@admin_required
+def admin_view(request):
+    # View logic for Admin
+    return render(request, 'relationship_app/admin_view.html')
+
+@librarian_required
+def librarian_view(request):
+    # View logic for Librarian
+    return render(request, 'relationship_app/librarian_view.html')
+
+@member_required
+def member_view(request):
+    # View logic for Member
+    return render(request, 'relationship_app/member_view.html')
+
+
