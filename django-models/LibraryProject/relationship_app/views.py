@@ -41,14 +41,6 @@ def admin_view(request):
     # View logic for Admin
     return render(request, 'relationship_app/admin_view.html')
 
-@librarian_required
-def librarian_view(request):
-    # View logic for Librarian
-    return render(request, 'relationship_app/librarian_view.html')
 
-@member_required
-def member_view(request):
-    # View logic for Member
-    return render(request, 'relationship_app/member_view.html')
 
 
