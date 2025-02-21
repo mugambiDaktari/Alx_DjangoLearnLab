@@ -10,6 +10,8 @@ from django.contrib.auth import login
 
 from django.contrib.auth.decorators import user_passes_test, permission_required, login_required
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+
 
 # Create your views here
 def list_books(request):
@@ -62,7 +64,7 @@ def member_view(request):
     return render(request, 'relationship_app/member_view.html')
 
 @login_required
-@permission_required('your_app.can_add_book', raise_exception=True)
+@permission_required('relationship_app.can_add_book', raise_exception=True)
 def add_book_view(request):
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -73,7 +75,7 @@ def add_book_view(request):
     return render(request, 'books/add_book.html')
 
 @login_required
-@permission_required('your_app.can_change_book', raise_exception=True)
+@permission_required('relationship_app.can_change_book', raise_exception=True)
 def edit_book_view(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     if request.method == 'POST':
@@ -87,7 +89,7 @@ def edit_book_view(request, book_id):
     return render(request, 'books/edit_book.html', {'book': book})
 
 @login_required
-@permission_required('your_app.can_delete_book', raise_exception=True)
+@permission_required('relationship_app.can_delete_book', raise_exception=True)
 def delete_book_view(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     if request.method == 'POST':
