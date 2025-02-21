@@ -8,9 +8,10 @@ from django.views.generic import CreateView
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 
-from django.contrib.auth.decorators import user_passes_test, permission_required, login_required
+from django.contrib.auth.decorators import user_passes_test, permission_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import permission_required
 
 
 # Create your views here
