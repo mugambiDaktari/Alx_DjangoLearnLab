@@ -36,10 +36,30 @@ def user_is_admin(user):
         return True
     raise PermissionDenied
 
+def user_is_librarian(user):
+    if user.userprofile.role == 'Librarian':
+        return True
+    raise PermissionDenied
+
+def user_is_member(user):
+    if user.userprofile.role == 'Member':
+        return True
+    raise PermissionDenied
+
 @user_passes_test(user_is_admin)
 def admin_view(request):
     # View logic for Admin
     return render(request, 'relationship_app/admin_view.html')
+
+@user_passes_test(user_is_librarian)
+def librarian_view(request):
+    # View logic for Admin
+    return render(request, 'relationship_app/librarian_view.html')
+
+@user_passes_test(user_is_member)
+def member_view(request):
+    # View logic for Admin
+    return render(request, 'relationship_app/member_view.html')
 
 
 
