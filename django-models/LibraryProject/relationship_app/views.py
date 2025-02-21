@@ -8,7 +8,8 @@ from django.views.generic import CreateView
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 
-from .utils import admin_required, librarian_required, member_required
+from django.contrib.auth.decorators import user_passes_test
+from django.core.exceptions import PermissionDenied
 
 # Create your views here
 def list_books(request):
@@ -30,7 +31,12 @@ def register(request):
         form = UserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
 
-@admin_required
+def user_is_admin(user):
+    if user.userprofile.role == 'Admin':
+        return True
+    raise PermissionDenied
+
+@user_passes_test(user_is_admin)
 def admin_view(request):
     # View logic for Admin
     return render(request, 'relationship_app/admin_view.html')
