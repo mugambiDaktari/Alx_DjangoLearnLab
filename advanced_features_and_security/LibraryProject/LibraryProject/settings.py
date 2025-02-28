@@ -141,6 +141,7 @@ SECURE_HSTS_SECONDS = 31536000  # One year (365 days)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply to all subdomains
 SECURE_HSTS_PRELOAD = True  # Allow the site to be preloaded in browsers' HSTS list
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Use 'https' header for detecting secure connections
 
 # Content Security Policy settings
 CSP_DEFAULT_SRC = ("'self'",)  # Only allow resources from the same origin
