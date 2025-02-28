@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%0y!eddnpbn9bpb%ep(nb(84#ado&i-c!1u_!yl%*)*h@j#all'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'csp.middleware.CSPMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -125,3 +126,28 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
+
+# Security settings
+SECURE_BROWSER_XSS_FILTER = True  # Protects against XSS attacks
+X_FRAME_OPTIONS = 'DENY'  # Prevents clickjacking
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevents MIME-type sniffing
+
+# Secure cookies settings
+CSRF_COOKIE_SECURE = True  # Ensures CSRF cookies are only sent over HTTPS
+SESSION_COOKIE_SECURE = True  # Ensures session cookies are only sent over HTTPS
+SECURE_SSL_REDIRECT = True  # Redirects HTTP requests to HTTPS
+
+
+# Content Security Policy settings
+CSP_DEFAULT_SRC = ("'self'",)  # Only allow resources from the same origin
+CSP_SCRIPT_SRC = ("'self'", "https://trusted.cdn.com")  # Allow scripts from self and trusted CDN
+CSP_STYLE_SRC = ("'self'", "https://trusted.styles.com")  # Allow styles from self and trusted styles CDN
+CSP_IMG_SRC = ("'self'", "https://images.com")  # Allow images from self and specific domain
+CSP_FONT_SRC = ("'self'", "https://fonts.googleapis.com", "https://fonts.gstatic.com")  # Font sources
+CSP_CONNECT_SRC = ("'self'", "https://api.trusted.com")  # Allow API calls to trusted domains
+CSP_FRAME_SRC = ("'none'",)  # Block iframes
+CSP_OBJECT_SRC = ("'none'",)  # Block Flash and other plugins
+CSP_BASE_URI = ("'none'",)  # Block <base> tag usage
+CSP_FORM_ACTION = ("'self'",)  # Only allow forms to be submitted to self
+CSP_FRAME_ANCESTORS = ("'none'",)  # Block embedding in iframes
+CSP_BLOCK_ALL_MIXED_CONTENT = True  # Block HTTP content on HTTPS pages
