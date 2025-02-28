@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden
 from .models import Book
-from .forms import BookForm
+from .forms import BookForm, ExampleForm
 # Create your views here.
 
 @login_required

@@ -2,7 +2,7 @@ from django import forms
 from .models import Book
 from django.core.validators import RegexValidator
 
-class Form(forms.ModelForm):
+class BookForm(forms.ModelForm):
     class Meta:
         model = Book
         fields = ['title', 'author', 'publication_year']
