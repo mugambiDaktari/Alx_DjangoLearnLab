@@ -36,6 +36,7 @@ class BookSerializer(serializers.ModelSerializer):
                 f"Publication year cannot be in the future. Current year is {current_year}."
             )
         return value  # Return the validated publication year
+    
 
 
 class AuthorSerializer(serializers.ModelSerializer):
