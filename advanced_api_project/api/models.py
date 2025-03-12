@@ -54,3 +54,4 @@ class Book(models.Model):
         - Returns the book title when the object is printed.
         """
         return self.title
+
