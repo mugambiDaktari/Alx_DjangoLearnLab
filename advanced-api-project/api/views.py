@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework import status
@@ -55,7 +56,7 @@ class BookUpdateView(generics.UpdateAPIView):
     filter_backends = [SearchFilter, OrderingFilter] # Enable search and ordering filters
     search_fields = ['title', 'publication_year'] # Allow searching by title and publication year
     ordering_fields = ['title', 'author'] # Allow ordering by title, and author.
-    
+
 
 class BookDeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()  # Get all books from the database
