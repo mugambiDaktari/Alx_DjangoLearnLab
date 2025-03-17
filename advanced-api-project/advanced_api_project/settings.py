@@ -66,14 +66,16 @@ WSGI_APPLICATION = 'advanced_api_project.wsgi.application'
 
 DATABASES = {
     #configuring the database settings
+   
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Use 'django.db.backends.postgresql' for PostgreSQL
-        'NAME': 'django_blog',  # The database name
-        'USER': 'Cliff',  # The MySQL user
-        'PASSWORD': 'Cliff4950*',  # The MySQL password
-        'HOST': 'localhost',  # Set to your database server (or use an IP)
-        'PORT': '3306',  # Default MySQL port
+        "ENGINE": 'django.db.backends.mysql',  # Use 'django.db.backends.postgresql' for PostgreSQL
+        "NAME": 'django_blog',  # The database name
+        "USER": 'Cliff',  # The MySQL user
+        "PASSWORD": 'Cliff4950*',  # The MySQL password
+        "HOST": 'localhost',  # Set to your database server (or use an IP)
+        "PORT": '3306',  # Default MySQL port
     }
+     #adde double quotes to the values above
 }
 
 
