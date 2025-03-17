@@ -65,6 +65,7 @@ WSGI_APPLICATION = 'advanced_api_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
+    #configuring the database settings
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Use 'django.db.backends.postgresql' for PostgreSQL
         'NAME': 'django_blog',  # The database name
