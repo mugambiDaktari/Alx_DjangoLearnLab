@@ -4,6 +4,11 @@ from django.contrib.auth import login
 from .forms import UserRegisterForm
 from django.contrib.auth.decorators import login_required
 from .forms import UserUpdateForm, ProfileUpdateForm
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from .models import Post
 
 def register(request):
     if request.method == 'POST':
@@ -39,3 +44,45 @@ def profile(request):
         'profile_form': profile_form
     }
     return render(request, 'blog/profile.html', context)
+
+# List View - Display all posts
+class PostListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'  # Template to use
+    context_object_name = 'posts'
+    ordering = ['-published_date']  # Show latest posts first
+
+# Detail View - Display single post
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'blog/post_detail.html'  # Template to use
+
+# Create View - Allow users to create new posts
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name = 'blog/post_form.html'  # Template to use
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user  # Assign logged-in user as author
+        return super().form_valid(form)
+
+# Update View - Allow authors to edit their own posts
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name = 'blog/post_form.html'
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author  # Allow only the author to edit
+
+# Delete View - Allow authors to delete their own posts
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+    template_name = 'blog/post_confirm_delete.html'
+    success_url = reverse_lazy('post-list')
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author  # Allow only the author to delete
