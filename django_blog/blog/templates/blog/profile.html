@@ -1,11 +1,28 @@
-{% extends "base.html" %}
-
 {% block content %}
     <h2>Welcome, {{ user.username }}!</h2>
     <p>Email: {{ user.email }}</p>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <h3>Update Your Profile</h3>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ user_form.as_p }}
+        {{ profile_form.as_p }}
+        <button type="submit">Update</button>
+    </form>
+
+    {% if user.profile.image %}
+        <h3>Profile Picture</h3>
+        <img src="{{ user.profile.image.url }}" alt="Profile Picture" width="150">
+    {% endif %}
+
     <form action="{% url 'logout' %}" method="post">
         {% csrf_token %}
         <button type="submit">Logout</button>
     </form>
 {% endblock %}
-

@@ -1,6 +1,8 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
 from . import views  
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     # Built-in login/logout views
@@ -13,3 +15,5 @@ urlpatterns = [
     # Profile page (to be implemented later)
     path('profile/', views.profile, name='profile'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
