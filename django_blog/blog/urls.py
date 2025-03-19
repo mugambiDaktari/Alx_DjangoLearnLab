@@ -3,7 +3,7 @@ from django.urls import path
 from . import views  
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView, CommentListView,  CommentCreateView, CommentUpdateView, CommentDeleteView, PostsByTagView, search_posts
+from .views import PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView, CommentListView,  CommentCreateView, CommentUpdateView, CommentDeleteView, search_posts, PostsByTagListView
 
 urlpatterns = [
     # Built-in login/logout views
@@ -28,7 +28,8 @@ urlpatterns = [
     path('post/<int:post_id>/comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
 
     path('search/', search_posts, name='search-posts'),
-    path('tags/<slug:tag_slug>/', PostsByTagView.as_view(), name='posts-by-tag'),
+    path('tags/<slug:tag_slug>/', PostsByTagListView.as_view(), name='posts-by-tag'),
+    path('tags/<slug:tag_slug>/', PostsByTagListView.as_view(), name='posts-by-tag'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
