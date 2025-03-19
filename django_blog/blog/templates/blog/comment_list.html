@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Comments</h2>
+    {% for comment in comments %}
+        <div>
+            <p><strong>{{ comment.author }}</strong> ({{ comment.created_at }})</p>
+            <p>{{ comment.content }}</p>
+            {% if user == comment.author %}
+                <a href="{% url 'comment-update' comment.id %}">Edit</a>
+                <a href="{% url 'comment-delete' comment.id %}">Delete</a>
+            {% endif %}
+        </div>
+        <hr>
+    {% empty %}
+        <p>No comments yet.</p>
+    {% endfor %}
+{% endblock %}

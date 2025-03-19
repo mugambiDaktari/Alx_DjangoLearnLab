@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import Post
+from .models import Post, Comment
 
 def register(request):
     if request.method == 'POST':
@@ -86,3 +86,11 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author  # Allow only the author to delete
+
+class CommentListView(ListView):
+    model = Comment
+    template_name = 'blog/comment_list.html'  
+    context_object_name = 'comments'
+
+    def get_queryset(self):
+        return Comment.objects.filter(post_id=self.kwargs['post_id']).order_by('-created_at')
