@@ -6,8 +6,8 @@
             <p><strong>{{ comment.author }}</strong> ({{ comment.created_at }})</p>
             <p>{{ comment.content }}</p>
             {% if user == comment.author %}
-                <a href="{% url 'comment-update' comment.id %}">Edit</a>
-                <a href="{% url 'comment-delete' comment.id %}">Delete</a>
+            <a href="{% url 'comment-update' comment.post.id comment.id %}">Edit</a>
+            <a href="{% url 'comment-delete' comment.post.id comment.id %}">Delete</a>
             {% endif %}
         </div>
         <hr>
