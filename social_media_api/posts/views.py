@@ -76,49 +76,38 @@ class FeedView(generics.ListAPIView):
         return Post.objects.filter(author__in=following_users).order_by('-created_at')  # Get posts from those users that the current user follows
     
 
-class LikePostView(generics.CreateAPIView):
-    serializer_class = LikeSerializer
+class LikePostView(generics.GenericAPIView):
+    """Allows an authenticated user to like a post."""
     permission_classes = [permissions.IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        user = request.user
-        post_id = self.kwargs.get('post_id')
+    def post(self, request, pk, *args, **kwargs):
+        """Handles post liking."""
+        post = generics.get_object_or_404(Post, pk=pk)  # Ensure post exists
+        like, created = Like.objects.get_or_create(author=request.user, post=post)  # Like post
 
-        # ✅ Use get_object_or_404
-        post = get_object_or_404(Post, pk=post_id)
-
-        # ✅ Use get_or_create
-        like, created = Like.objects.get_or_create(author=user, post=post)
-        if not created:
-            return Response({"error": "You already liked this post"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # ✅ Generate notification if liker is not the post owner
-        if post.author != user:
+        if created:
+            # Create a notification for the post owner
             Notification.objects.create(
                 recipient=post.author,
-                actor=user,
+                actor=request.user,
                 verb="liked your post"
             )
+            return Response({"message": "Post liked successfully."}, status=status.HTTP_201_CREATED)
 
-        return Response(LikeSerializer(like).data, status=status.HTTP_201_CREATED)
+        return Response({"message": "You have already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
 
-class UnlikePostView(generics.DestroyAPIView):
+
+class UnlikePostView(generics.GenericAPIView):
+    """Allows an authenticated user to unlike a post."""
     permission_classes = [permissions.IsAuthenticated]
 
-    def delete(self, request, *args, **kwargs):
-        user = request.user
-        post_id = self.kwargs.get('post_id')
+    def delete(self, request, pk, *args, **kwargs):
+        """Handles post unliking."""
+        post = generics.get_object_or_404(Post, pk=pk)  # Ensure post exists
+        like = Like.objects.filter(author=request.user, post=post)  # Check if user liked
 
-        # ✅ Use get_object_or_404
-        like = get_object_or_404(Like, author=user, post_id=post_id)
+        if like.exists():
+            like.delete()  # Unlike the post
+            return Response({"message": "Post unliked successfully."}, status=status.HTTP_200_OK)
 
-        like.delete()  # ✅ Remove like
-
-        # ✅ Delete the notification
-        Notification.objects.filter(
-            recipient=like.post.author,
-            actor=user,
-            verb="liked your post"
-        ).delete()
-
-        return Response({"message": "Post unliked successfully"}, status=status.HTTP_200_OK)
+        return Response({"error": "You haven't liked this post."}, status=status.HTTP_400_BAD_REQUEST)
