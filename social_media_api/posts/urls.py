@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PostViewSet, CommentViewSet, FeedView
+from .views import PostViewSet, CommentViewSet, FeedView, LikePostView, UnlikePostView
 
 urlpatterns = [
     path('posts/', PostViewSet.as_view({'get': 'list', 'post': 'create'}), name='posts'),
@@ -10,4 +10,7 @@ urlpatterns = [
         'patch': 'partial_update', 'delete': 'destroy'}), name='comment'),
 
     path('feed/', FeedView.as_view(), name='feed'),
+
+    path('posts/<int:pk>/like/', LikePostView.as_view(), name='like_post'),
+    path('posts/<int:pk>/unlike/', UnlikePostView.as_view(), name='unlike_post'),
 ]

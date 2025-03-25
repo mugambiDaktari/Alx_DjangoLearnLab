@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
-from .models import Post, Comment
+from .models import Post, Comment, Like
 
 User = get_user_model() 
 
@@ -35,6 +35,10 @@ class PostSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
-
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        fields = ['id', 'author', 'post', 'created_at']
+        read_only_fields = ['author']  # Prevent users from setting the author themselves
 
 

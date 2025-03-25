@@ -8,6 +8,7 @@ from .serializers import UserSerializer, LoginSerializer
 from django.shortcuts import get_object_or_404
 from .models import CustomUser 
 
+from notifications.models import Notification
 User = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
@@ -44,18 +45,27 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user  # Ensure users can only access their own profile\
     
 class FollowUserView(generics.GenericAPIView):
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()  # Ensures the view has a defined queryset
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, username, *args, **kwargs):  # Use username from URL
+    def post(self, request, *args, **kwargs):
+        """Allows an authenticated user to follow another user using their ID."""
         user = request.user
-        following_user = get_object_or_404(User, username=username)  # Cleaner lookup
+        following_user_id = request.data.get('following_user_id')
 
+        # Ensure the ID is provided
+        if not following_user_id:
+            return Response({"error": "Following user ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        following_user = get_object_or_404(User, id=following_user_id)  # Cleaner lookup
+
+        # Prevent self-following
         if user == following_user:
             return Response({"error": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Add the following relationship
         user.following.add(following_user)
-        return Response({"message": f"You are now following {username}."}, status=status.HTTP_200_OK)
+        return Response({"message": f"You are now following {following_user.username}."}, status=status.HTTP_200_OK)
 
 class UnfollowUserView(generics.UpdateAPIView):
     queryset = CustomUser.objects.all()
