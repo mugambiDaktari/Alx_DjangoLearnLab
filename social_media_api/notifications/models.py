@@ -7,6 +7,7 @@ class Notification(models.Model):
     actor = models.ForeignKey(User, on_delete=models.CASCADE)
     verb = models.CharField(max_length=255)
     is_read = models.BooleanField(default=False)  # To track unread notifications
+    target = models.GenericForeignKey()  # To store the target object of the notification
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
