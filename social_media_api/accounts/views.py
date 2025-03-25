@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny
 from .serializers import UserSerializer, LoginSerializer
 from django.shortcuts import get_object_or_404
+from .models import CustomUser 
 
 User = get_user_model()
 
@@ -43,6 +44,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user  # Ensure users can only access their own profile\
     
 class FollowUserView(generics.GenericAPIView):
+    queryset = CustomUser.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, username, *args, **kwargs):  # Use username from URL
@@ -56,6 +58,7 @@ class FollowUserView(generics.GenericAPIView):
         return Response({"message": f"You are now following {username}."}, status=status.HTTP_200_OK)
 
 class UnfollowUserView(generics.UpdateAPIView):
+    queryset = CustomUser.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
     def update(self, request, username, *args, **kwargs):
