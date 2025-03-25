@@ -83,7 +83,7 @@ class LikePostView(generics.GenericAPIView):
     def post(self, request, pk, *args, **kwargs):
         """Handles post liking."""
         post = generics.get_object_or_404(Post, pk=pk)  # Ensure post exists
-        like, created = Like.objects.get_or_create(author=request.user, post=post)  # Like post
+        like, created = Like.objects.get_or_create(user=request.user, post=post)  # Fix: Use 'user' field
 
         if created:
             # Create a notification for the post owner
@@ -104,7 +104,7 @@ class UnlikePostView(generics.GenericAPIView):
     def delete(self, request, pk, *args, **kwargs):
         """Handles post unliking."""
         post = generics.get_object_or_404(Post, pk=pk)  # Ensure post exists
-        like = Like.objects.filter(author=request.user, post=post)  # Check if user liked
+        like = Like.objects.filter(user=request.user, post=post)  # Fix: Use 'user' field
 
         if like.exists():
             like.delete()  # Unlike the post
