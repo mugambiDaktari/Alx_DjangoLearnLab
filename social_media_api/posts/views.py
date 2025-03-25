@@ -8,7 +8,7 @@ from .models import Post, Comment, Like
 from rest_framework import generics, permissions
 
 from notifications.models import Notification # Import the Notification model
-
+from django.shortcuts import get_object_or_404
 
 
 
@@ -75,6 +75,7 @@ class FeedView(generics.ListAPIView):
         following_users = user.following.all()  # Get users the current user follows
         return Post.objects.filter(author__in=following_users).order_by('-created_at')  # Get posts from those users that the current user follows
     
+
 class LikePostView(generics.CreateAPIView):
     serializer_class = LikeSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -83,16 +84,15 @@ class LikePostView(generics.CreateAPIView):
         user = request.user
         post_id = self.kwargs.get('post_id')
 
-        post = Post.objects.filter(id=post_id).first()
-        if not post:
-            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+        # ✅ Use get_object_or_404
+        post = get_object_or_404(Post, pk=post_id)
 
-        if Like.objects.filter(author=user, post=post).exists():
+        # ✅ Use get_or_create
+        like, created = Like.objects.get_or_create(author=user, post=post)
+        if not created:
             return Response({"error": "You already liked this post"}, status=status.HTTP_400_BAD_REQUEST)
 
-        like = Like.objects.create(author=user, post=post)
-
-        # Generate a notification if the liker is not the post owner
+        # ✅ Generate notification if liker is not the post owner
         if post.author != user:
             Notification.objects.create(
                 recipient=post.author,
@@ -109,14 +109,12 @@ class UnlikePostView(generics.DestroyAPIView):
         user = request.user
         post_id = self.kwargs.get('post_id')
 
-        # Check if the like exists
-        like = Like.objects.filter(author=user, post_id=post_id).first()
-        if not like:
-            return Response({"error": "You have not liked this post"}, status=status.HTTP_400_BAD_REQUEST)
+        # ✅ Use get_object_or_404
+        like = get_object_or_404(Like, author=user, post_id=post_id)
 
-        like.delete()  # Remove like
+        like.delete()  # ✅ Remove like
 
-        # Delete the notification
+        # ✅ Delete the notification
         Notification.objects.filter(
             recipient=like.post.author,
             actor=user,
