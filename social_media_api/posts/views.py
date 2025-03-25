@@ -6,6 +6,10 @@ from rest_framework.response import Response
 from .serializers import PostSerializer, CommentSerializer
 from .models import Post, Comment
 
+from rest_framework import generics, permissions
+
+
+
 
 # Create your views here.
 class PostViewSet(viewsets.ModelViewSet):
@@ -36,5 +40,12 @@ class CommentViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-   
+class FeedView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Must be logged in
+
+    def get_queryset(self):
+        user = self.request.user
+        following_users = user.following.all()  # Get users the current user follows
+        return Post.objects.filter(author__in=following_users).order_by('-created_at')  # Get posts from those users that the current user follows
     
