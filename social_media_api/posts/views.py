@@ -11,6 +11,15 @@ from notifications.models import Notification # Import the Notification model
 from django.shortcuts import get_object_or_404
 
 
+from django.views.generic import TemplateView
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
+
+class HomePageView(TemplateView):
+    template_name = "posts/homepage.html"
+
 
 # Create your views here.
 class PostViewSet(viewsets.ModelViewSet):

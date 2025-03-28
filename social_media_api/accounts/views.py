@@ -4,7 +4,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status, generics, permissions
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny
-from .serializers import UserSerializer, LoginSerializer
+from .serializers import UserSerializer, LoginSerializer, FollowSerializer
 from django.shortcuts import get_object_or_404
 from .models import CustomUser 
 
@@ -45,28 +45,32 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user  # Ensure users can only access their own profile\
     
 class FollowUserView(generics.GenericAPIView):
-    queryset = User.objects.all()  # Ensures the view has a defined queryset
+    queryset = User.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = FollowSerializer
 
     def post(self, request, *args, **kwargs):
-        """Allows an authenticated user to follow another user using their ID."""
+        """ Allows an authenticated user to follow another user. """
         user = request.user
         following_user_id = request.data.get('following_user_id')
 
-        # Ensure the ID is provided
         if not following_user_id:
             return Response({"error": "Following user ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        following_user = get_object_or_404(User, id=following_user_id)  # Cleaner lookup
+        following_user = get_object_or_404(User, id=following_user_id)
 
-        # Prevent self-following
         if user == following_user:
             return Response({"error": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Add the following relationship
-        user.following.add(following_user)
-        return Response({"message": f"You are now following {following_user.username}."}, status=status.HTTP_200_OK)
+        if user.following.filter(id=following_user.id).exists():
+            return Response({"error": "You are already following this user."}, status=status.HTTP_400_BAD_REQUEST)
 
+        user.following.add(following_user)
+
+        return Response({
+            "message": f"You are now following {following_user.username}.",
+            "follower_count": following_user.followers.count()
+        }, status=status.HTTP_200_OK)
 class UnfollowUserView(generics.UpdateAPIView):
     queryset = CustomUser.objects.all()
     permission_classes = [permissions.IsAuthenticated]
