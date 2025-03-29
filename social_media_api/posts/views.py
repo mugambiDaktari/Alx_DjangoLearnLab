@@ -85,26 +85,35 @@ class FeedView(generics.ListAPIView):
         return Post.objects.filter(author__in=following_users).order_by('-created_at')  # Get posts from those users that the current user follows
     
 
+from django.contrib.contenttypes.models import ContentType
+
+from django.contrib.contenttypes.models import ContentType
+
 class LikePostView(generics.GenericAPIView):
-    """Allows an authenticated user to like a post."""
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = LikeSerializer
 
     def post(self, request, pk, *args, **kwargs):
-        """Handles post liking."""
         post = generics.get_object_or_404(Post, pk=pk)  # Ensure post exists
-        like, created = Like.objects.get_or_create(user=request.user, post=post)  # Fix: Use 'user' field
+
+        # Prevent users from liking their own posts
+        if post.author == request.user:
+            return Response({"error": "You cannot like your own post."}, status=status.HTTP_400_BAD_REQUEST)
+
+        like, created = Like.objects.get_or_create(user=request.user, post=post) 
 
         if created:
             # Create a notification for the post owner
             Notification.objects.create(
                 recipient=post.author,
                 actor=request.user,
-                verb="liked your post"
+                verb="liked your post",
+                content_type=ContentType.objects.get_for_model(Post),
+                object_id=post.id
             )
             return Response({"message": "Post liked successfully."}, status=status.HTTP_201_CREATED)
 
         return Response({"message": "You have already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
-
 
 class UnlikePostView(generics.GenericAPIView):
     """Allows an authenticated user to unlike a post."""

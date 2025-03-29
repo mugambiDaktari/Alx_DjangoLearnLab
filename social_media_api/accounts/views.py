@@ -4,7 +4,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status, generics, permissions
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny
-from .serializers import UserSerializer, LoginSerializer, FollowSerializer
+from .serializers import UserSerializer, LoginSerializer, FollowSerializer, UnFollowSerializer
 from django.shortcuts import get_object_or_404
 from .models import CustomUser 
 
@@ -50,7 +50,7 @@ class FollowUserView(generics.GenericAPIView):
     serializer_class = FollowSerializer
 
     def post(self, request, *args, **kwargs):
-        """ Allows an authenticated user to follow another user. """
+        # Allows an authenticated user to follow another user. 
         user = request.user
         following_user_id = request.data.get('following_user_id')
 
@@ -71,20 +71,26 @@ class FollowUserView(generics.GenericAPIView):
             "message": f"You are now following {following_user.username}.",
             "follower_count": following_user.followers.count()
         }, status=status.HTTP_200_OK)
-class UnfollowUserView(generics.UpdateAPIView):
+
+from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
+
+class UnfollowUserView(generics.DestroyAPIView):
+    """Allow an authenticated user to unfollow another user."""
     queryset = CustomUser.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UnFollowSerializer
 
-    def update(self, request, username, *args, **kwargs):
-        user_to_unfollow = get_object_or_404(User, username=username)
+    def delete(self, request, *args, **kwargs):  # Changed from POST to DELETE
         user = request.user
+        user_id_to_unfollow = kwargs.get("pk")  # Now consistent with FollowUserView
+
+        user_to_unfollow = get_object_or_404(CustomUser, id=user_id_to_unfollow)
 
         if user == user_to_unfollow:
             return Response({"error": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user_to_unfollow not in user.following.all():
-            return Response({"error": f"You are not following {username}."}, status=status.HTTP_400_BAD_REQUEST)
+        if not user.following.filter(id=user_to_unfollow.id).exists():
+            return Response({"error": f"You are not following {user_to_unfollow.username}."}, status=status.HTTP_400_BAD_REQUEST)
 
         user.following.remove(user_to_unfollow)
-        return Response({"message": f"You have unfollowed {username}."}, status=status.HTTP_200_OK)
-    
+        return Response({"message": f"You have unfollowed {user_to_unfollow.username}."}, status=status.HTTP_200_OK)

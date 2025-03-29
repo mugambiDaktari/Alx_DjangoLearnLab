@@ -21,9 +21,10 @@ class CommentSerializer(serializers.ModelSerializer):
     
 class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
+    likes = serializers.IntegerField(source='likes_count', read_only=True)
     class Meta:
         model = Post
-        fields = ['id', 'author', 'title', 'content', 'comments', 'created_at', 'updated_at']
+        fields = ['id', 'author', 'title', 'content', 'comments', 'likes', 'created_at', 'updated_at']
         read_only_fields = ['author', 'created_at', 'updated_at']
 
     def create(self, validated_data):
@@ -38,7 +39,11 @@ class PostSerializer(serializers.ModelSerializer):
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
-        fields = ['id', 'author', 'post', 'created_at']
+        fields = ['id', 'user', 'post', 'created_at']
         read_only_fields = ['author']  # Prevent users from setting the author themselves
+
+from rest_framework import serializers
+from .models import Like
+
 
 

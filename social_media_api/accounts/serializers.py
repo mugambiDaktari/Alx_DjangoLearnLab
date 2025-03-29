@@ -5,8 +5,6 @@ from .models import CustomUser  # Ensure this is the correct import
 
 User = get_user_model()
 
-class FollowSerializer(serializers.Serializer):
-    following_user_id = serializers.IntegerField()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser  # Ensure this is the correct model
@@ -28,6 +26,11 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
+class FollowSerializer(serializers.Serializer):
+    following_user_id = serializers.IntegerField()
+
+class UnFollowSerializer(serializers.Serializer):
+    following_user_id = serializers.IntegerField()
 """
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
